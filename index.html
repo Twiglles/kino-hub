@@ -81,6 +81,7 @@
       color: rgba(255, 255, 255, .85);
     }
     .mt-text:empty { display: none; }
+    .month-theme[hidden] { display: none; }
     /* Главная кнопка — красная */
     .item.accent { background: var(--accent); border-color: transparent; padding: 20px 18px; }
     .item.accent .ico { background: rgba(0, 0, 0, .28); }
@@ -129,7 +130,7 @@
   <main>
     <img class="logo" src="logo.svg" alt="Twiglles Киношная" width="172" height="48">
 
-    <h1 class="month-theme">
+    <h1 class="month-theme" id="month-theme" hidden>
       <span class="mt-label" id="theme-label">Тема месяца</span>
       <span class="mt-text" id="theme-text"></span>
     </h1>
@@ -269,6 +270,7 @@
         .then(function (html) {
           var m = html.match(/<p class="theme">([^<]+)<\/p>/);
           if (m && m[1].trim()) {
+            document.getElementById('month-theme').hidden = false;
             // «Тема ноября — фильмы, основанные на реальных событиях»: до тире — заголовок, после — сама тема
             var full = m[1].trim();
             var cut = full.search(/\s[—–-]\s/);
