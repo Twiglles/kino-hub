@@ -8,6 +8,9 @@
   <title>Twiglles Киношная</title>
   <meta name="description" content="Киношная: голосование, календарь клуба, совместные просмотры и лекции">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
   <style>
     /* Палитра как на сайте клуба: чёрный, белый и красный #890C0C */
     @font-face {
@@ -67,10 +70,17 @@
     .item.theme .ico { background: rgba(0, 0, 0, .28); }
     .item.theme .hint { color: rgba(255, 255, 255, .85); font-size: 14px; }
     /* Тема месяца — заголовок над кнопками */
-    .month-theme {
-      margin: 0 4px 20px; text-align: center;
-      font: 600 17px/1.35 Benzin, Unbounded, sans-serif; letter-spacing: .02em;
+    .month-theme { margin: 0 4px 22px; text-align: center; font-weight: 500; }
+    .mt-label {
+      display: block;
+      font: 600 20px/1.2 Benzin, Unbounded, sans-serif; letter-spacing: .02em;
     }
+    .mt-text {
+      display: block; margin-top: 8px;
+      font: italic 500 16px/1.4 Montserrat, Inter, system-ui, sans-serif;
+      color: rgba(255, 255, 255, .85);
+    }
+    .mt-text:empty { display: none; }
     /* Главная кнопка — красная */
     .item.accent { background: var(--accent); border-color: transparent; padding: 20px 18px; }
     .item.accent .ico { background: rgba(0, 0, 0, .28); }
@@ -119,7 +129,10 @@
   <main>
     <img class="logo" src="logo.svg" alt="Twiglles Киношная" width="172" height="48">
 
-    <h1 class="month-theme" id="theme-text">Тема месяца</h1>
+    <h1 class="month-theme">
+      <span class="mt-label" id="theme-label">Тема месяца</span>
+      <span class="mt-text" id="theme-text"></span>
+    </h1>
 
     <ul class="menu">
       <li>
@@ -256,7 +269,15 @@
         .then(function (html) {
           var m = html.match(/<p class="theme">([^<]+)<\/p>/);
           if (m && m[1].trim()) {
-            document.getElementById('theme-text').textContent = m[1].trim();
+            // «Тема ноября — фильмы, основанные на реальных событиях»: до тире — заголовок, после — сама тема
+            var full = m[1].trim();
+            var cut = full.search(/\s[—–-]\s/);
+            if (cut > 0) {
+              document.getElementById('theme-label').textContent = full.slice(0, cut);
+              document.getElementById('theme-text').textContent = full.slice(cut).replace(/^\s[—–-]\s/, '');
+            } else {
+              document.getElementById('theme-label').textContent = full;
+            }
           }
         })
         .catch(function () { /* останется текст по умолчанию */ });
