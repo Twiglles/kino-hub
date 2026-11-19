@@ -66,14 +66,25 @@
     .item.theme { background: var(--accent); border-color: transparent; padding: 20px 18px; }
     .item.theme .ico { background: rgba(0, 0, 0, .28); }
     .item.theme .hint { color: rgba(255, 255, 255, .85); font-size: 14px; }
-    .item.theme:active { background: #6f0a0a; }
-    @media (hover: hover) { .item.theme:hover { background: #9c0f0f; } }
+    /* Тема месяца — просто плашка, не кнопка */
+    .item.theme.static { cursor: default; transition: none; }
+    .item.theme.static:active { transform: none; background: var(--accent); }
 
     footer { margin-top: 26px; text-align: center; color: var(--muted); font-size: 12px; }
 
     /* Окно раздела: сайт показывается прямо внутри приложения */
-    .viewer { position: fixed; inset: 0; z-index: 10; background: var(--bg); display: none; flex-direction: column; }
-    .viewer.open { display: flex; }
+    .viewer {
+      position: fixed; inset: 0; z-index: 10; background: var(--bg);
+      display: flex; flex-direction: column;
+      visibility: hidden; opacity: 0; transform: translateX(28px);
+      transition: opacity .28s ease, transform .28s ease, visibility 0s linear .28s;
+    }
+    .viewer.open {
+      visibility: visible; opacity: 1; transform: none;
+      transition: opacity .28s ease, transform .28s ease, visibility 0s;
+    }
+    main { transition: opacity .28s ease, transform .28s ease; }
+    body.section-open main { opacity: 0; transform: translateX(-16px); }
     .vbar {
       flex: none; display: flex; align-items: center; gap: 12px;
       padding: max(10px, env(safe-area-inset-top)) 12px 10px;
@@ -85,7 +96,12 @@
       border-radius: 10px; padding: 8px 12px; font: inherit; font-size: 14px; cursor: pointer;
     }
     .vtitle { font: 600 12px/1 Benzin, Unbounded, sans-serif; letter-spacing: .06em; text-transform: uppercase; }
-    .vframe { flex: 1; width: 100%; border: 0; background: var(--bg); }
+    /* Раздел появляется плавно, когда загрузился: никакого белого мелькания */
+    .vframe {
+      flex: 1; width: 100%; border: 0; background: var(--bg); color-scheme: dark;
+      opacity: 0; transition: opacity .25s ease;
+    }
+    .vframe.ready { opacity: 1; }
     .vload { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); pointer-events: none; }
     .vload[hidden] { display: none; }
   </style>
@@ -96,14 +112,13 @@
 
     <ul class="menu">
       <li>
-        <a class="item theme" href="https://twiglles.github.io/kinoshnaya/">
+        <div class="item theme static">
           <span class="ico" aria-hidden="true">🎯</span>
           <span class="txt">
             <span class="name">Тема месяца</span>
             <span class="hint" id="theme-text">Узнайте, какую тему выбрал клуб</span>
           </span>
-          <span class="arrow" aria-hidden="true">›</span>
-        </a>
+        </div>
       </li>
       <li>
         <a class="item" href="https://twiglles.github.io/kinoshnaya/">
@@ -186,8 +201,10 @@
         isOpen = true;
         title.textContent = name;
         load.hidden = false;
-        frame.onload = function () { load.hidden = true; };
+        frame.classList.remove('ready');
+        frame.onload = function () { load.hidden = true; frame.classList.add('ready'); };
         frame.src = url;
+        document.body.classList.add('section-open');
         viewer.classList.add('open');
         viewer.setAttribute('aria-hidden', 'false');
         history.pushState({ section: true }, '');
@@ -197,8 +214,12 @@
         if (!isOpen) return;
         isOpen = false;
         viewer.classList.remove('open');
+        document.body.classList.remove('section-open');
         viewer.setAttribute('aria-hidden', 'true');
-        frame.removeAttribute('src');
+        // Страницу раздела убираем только после того, как окно плавно уехало
+        setTimeout(function () {
+          if (!isOpen) { frame.classList.remove('ready'); frame.removeAttribute('src'); }
+        }, 320);
         if (tg && tg.BackButton) { tg.BackButton.hide(); }
       }
 
