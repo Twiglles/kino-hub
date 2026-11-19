@@ -66,9 +66,18 @@
     .item.theme { background: var(--accent); border-color: transparent; padding: 20px 18px; }
     .item.theme .ico { background: rgba(0, 0, 0, .28); }
     .item.theme .hint { color: rgba(255, 255, 255, .85); font-size: 14px; }
-    /* Тема месяца — просто плашка, не кнопка */
-    .item.theme.static { cursor: default; transition: none; }
-    .item.theme.static:active { transform: none; background: var(--accent); }
+    /* Тема месяца — заголовок над кнопками */
+    .month-theme {
+      margin: 0 4px 20px; text-align: center;
+      font: 600 17px/1.35 Benzin, Unbounded, sans-serif; letter-spacing: .02em;
+    }
+    /* Главная кнопка — красная */
+    .item.accent { background: var(--accent); border-color: transparent; padding: 20px 18px; }
+    .item.accent .ico { background: rgba(0, 0, 0, .28); }
+    .item.accent .hint { color: rgba(255, 255, 255, .85); }
+    .item.accent .arrow { color: rgba(255, 255, 255, .85); }
+    .item.accent:active { background: #6f0a0a; }
+    @media (hover: hover) { .item.accent:hover { background: #9c0f0f; } }
 
     footer { margin-top: 26px; text-align: center; color: var(--muted); font-size: 12px; }
 
@@ -110,15 +119,18 @@
   <main>
     <img class="logo" src="logo.svg" alt="Twiglles Киношная" width="172" height="48">
 
+    <h1 class="month-theme" id="theme-text">Тема месяца</h1>
+
     <ul class="menu">
       <li>
-        <div class="item theme static">
+        <a class="item accent" href="vote.html">
           <span class="ico" aria-hidden="true">🎯</span>
           <span class="txt">
-            <span class="name">Тема месяца</span>
-            <span class="hint" id="theme-text">Узнайте, какую тему выбрал клуб</span>
+            <span class="name">Голосуем за тему декабря</span>
+            <span class="hint">Можно выбрать несколько вариантов</span>
           </span>
-        </div>
+          <span class="arrow" aria-hidden="true">›</span>
+        </a>
       </li>
       <li>
         <a class="item" href="https://twiglles.github.io/kinoshnaya/">
